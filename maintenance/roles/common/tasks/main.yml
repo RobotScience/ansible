@@ -1,0 +1,17 @@
+---
+- name: Update web servers
+  hosts: localhost
+  vars:
+    local_path: '/var/tmp'
+
+  tasks:
+
+  - name: Get path information
+    find:
+      paths: "{{ local_path }}"
+      recurse: no
+    register: path_output
+
+  - debug:
+      msg: "{{ path_output }}"
+
