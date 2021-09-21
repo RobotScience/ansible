@@ -10,3 +10,5 @@
       dest: "{{ clone_path }}"
       force: yes
       accept_hostkey: yes
+
+...
