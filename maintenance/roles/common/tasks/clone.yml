@@ -1,0 +1,12 @@
+---
+- name: Clone and merge repo from master
+  hosts: localhost
+
+  tasks:
+
+  - name: Clone the repo
+    ansible.builtin.git:
+      repo: "{{ clone_url }}"
+      dest: "{{ clone_path }}"
+      force: yes
+      accept_hostkey: yes
