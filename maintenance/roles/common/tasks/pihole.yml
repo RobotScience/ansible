@@ -1,0 +1,59 @@
+---
+
+- name: Update pihole
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+
+  - name: Get pihole version
+    command: pihole -v
+    register: output
+
+  - name: Set facts for output
+    set_fact:
+      ph_version_line: "{{ output.stdout_lines[0] }}"
+      lte_version_line: "{{ output.stdout_lines[1] }}"
+      ftl_version_line: "{{ output.stdout_lines[2] }}"
+
+  - name: Set facts for parsed data
+    set_fact:
+      ph_version_current: "{{ ph_version_line.split()[3] }}"
+      lte_version_current: "{{ lte_version_line.split()[3] }}"
+      ftl_version_current: "{{ ftl_version_line.split()[3] }}"
+      ph_version_latest: "{{ ph_version_line.split()[5] | replace(')', '') }}"
+      lte_version_latest: "{{ lte_version_line.split()[5] | replace(')', '') }}"
+      ftl_version_latest: "{{ ftl_version_line.split()[5] | replace(')', '') }}"
+
+  - name: Print output
+    debug:
+      msg: 
+      - "Pihole version is: {{ ph_version_current }}, latest version is: {{ ph_version_latest }}"
+      - "LTE version is: {{ lte_version_current }}, latest version is: {{ lte_version_current }}" 
+      - "FTL version is: {{ ftl_version_current }}, latest version is: {{ ftl_version_latest }}"
+    when: output != ''
+
+  - name: Update pihole
+    command: pihole -up
+    register: update_output
+    when: (ph_version_current != ph_version_latest) or (lte_version_current != lte_version_latest) or (ftl_version_current != ftl_version_latest)
+
+  - name: Print update output
+    debug:
+      msg: "{{ update_output }}"
+    when: update_output is defined
+
+  - name: Print update not needed
+    debug:
+      msg: "Pihole is up-to-date!"
+    when: (ph_version_current == ph_version_latest) and (lte_version_current == lte_version_latest) and (ftl_version_current == ftl_version_latest)
+
+  - name: Update gravity
+    command: pihole -g
+    register: gravity_output
+
+  - name: Print gravity update output
+    debug:
+      msg: "{{ gravity_output }}"
+
+...
